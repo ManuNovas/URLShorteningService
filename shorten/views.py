@@ -8,8 +8,8 @@ from shorten.serializers import ShortSerializer
 
 # Create your views here.
 @csrf_exempt
-def detail(request):
-    if request.method == "POST":
+def create(request):
+    try:
         data = JSONParser().parse(request)
         serializer = ShortSerializer(data=data)
         if serializer.is_valid():
@@ -17,6 +17,22 @@ def detail(request):
             response = JsonResponse(serializer.data, status=201)
         else:
             response = JsonResponse(serializer.errors, status=400)
-    else:
-        response = JsonResponse({"message": "Solicitud invalida."}, status=400)
+    except Exception as e:
+        print(e)
+        response = JsonResponse({"message": "Ocurrio un problema al crear la URL."}, status=500)
+    return response
+
+def retrieve(request, short_code):
+    try:
+        short = Short.objects.filter(shortCode=short_code).first()
+        if short is not None:
+            short.accessCount += 1
+            short.save()
+            resource = short.list_resource()
+            response = JsonResponse(resource, status=200)
+        else:
+            response = JsonResponse({"message": "URL no encontrada."}, status=404)
+    except Exception as e:
+        print(e)
+        response = JsonResponse({"message": "Ocurrio un problema al obtener la URL."}, status=500)
     return response

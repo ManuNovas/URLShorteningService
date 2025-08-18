@@ -4,5 +4,6 @@ from shorten import views
 
 app_name = "shorten"
 urlpatterns = [
-    path("", views.detail, name="create"),
+    path("", views.create, name="create"),
+    path("<str:short_code>", views.retrieve, name="retrieve"),
 ]

@@ -39,6 +39,9 @@ def retrieve(request, short_code):
                     response = JsonResponse(serializer.data)
                 else:
                     response = JsonResponse(serializer.errors, status=400)
+            elif request.method == "DELETE":
+                short.delete()
+                response = JsonResponse(short.list_resource(), status=204)
             else:
                 response = JsonResponse({"message": "Metodo no valido"}, status=405)
         else:

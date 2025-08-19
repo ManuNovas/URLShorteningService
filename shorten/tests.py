@@ -79,3 +79,16 @@ class TestShort(TestCase):
         self.create_short("https://youtu.be/gV5rIW1Qums?si=eesQll2_GSwE5rZQ", "1234QWER")
         response = self.client.delete(reverse("shorten:retrieve", args=["QWER1234"]))
         self.assertEqual(response.status_code, 404)
+
+    def test_stats_short(self):
+        short = self.create_short("https://youtu.be/gV5rIW1Qums?si=eesQll2_GSwE5rZQ", "1234QWER")
+        short.accessCount = 10
+        short.save()
+        response = self.client.get(reverse("shorten:stats", args=[short.shortCode]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["accessCount"], 10)
+
+    def test_stats_short_not_found(self):
+        self.create_short("https://youtu.be/gV5rIW1Qums?si=eesQll2_GSwE5rZQ", "1234QWER")
+        response = self.client.get(reverse("shorten:stats", args=["QWER1234"]))
+        self.assertEqual(response.status_code, 404)

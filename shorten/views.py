@@ -50,3 +50,17 @@ def retrieve(request, short_code):
         print(e)
         response = JsonResponse({"message": "Ocurrio un problema al obtener la URL."}, status=500)
     return response
+
+
+def stats(request, short_code):
+    try:
+        short = Short.objects.filter(shortCode=short_code).first()
+        if short is not None:
+            resource = short.detail_resource()
+            response = JsonResponse(resource)
+        else:
+            response = JsonResponse({"message": "URL no encontrada."}, status=404)
+    except Exception as e:
+        print(e)
+        response = JsonResponse({"message": "Ocurrio un problema al obtener las estadisticas."}, status=500)
+    return response

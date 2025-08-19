@@ -21,3 +21,8 @@ class ShortSerializer(Serializer):
             short_code_exists = Short.objects.filter(shortCode=short_code).exists()
         validated_data["shortCode"] = short_code
         return Short.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        instance.url = validated_data.get("url", instance.url)
+        instance.save()
+        return instance

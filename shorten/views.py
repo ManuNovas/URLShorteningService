@@ -26,10 +26,21 @@ def retrieve(request, short_code):
     try:
         short = Short.objects.filter(shortCode=short_code).first()
         if short is not None:
-            short.accessCount += 1
-            short.save()
-            resource = short.list_resource()
-            response = JsonResponse(resource, status=200)
+            if request.method == "GET":
+                short.accessCount += 1
+                short.save()
+                resource = short.list_resource()
+                response = JsonResponse(resource, status=200)
+            elif request.method == "PUT":
+                data = JSONParser().parse(request)
+                serializer = ShortSerializer(short, data=data)
+                if serializer.is_valid():
+                    serializer.save()
+                    response = JsonResponse(serializer.data)
+                else:
+                    response = JsonResponse(serializer.errors, status=400)
+            else:
+                response = JsonResponse({"message": "Metodo no valido"}, status=405)
         else:
             response = JsonResponse({"message": "URL no encontrada."}, status=404)
     except Exception as e:
